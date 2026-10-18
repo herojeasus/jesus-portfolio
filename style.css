@@ -535,3 +535,12 @@
 .fa .projects .cover-9 .cover-editorial-copy h3{font-family:Vazirmatn,Arial,sans-serif;letter-spacing:0;line-height:1.2;font-size:clamp(23px,13cqw,90px)}
 .fa .projects.home-projects .cover-9 .cover-editorial-copy{text-align:right}
 .fa .projects.home-projects .cover-9 .cover-editorial-copy h3{font-size:clamp(18px,8cqw,60px)}
+
+/* Pouyan nominees: original film frame, shared typography and interaction. */
+.projects.all-projects .cover-20{aspect-ratio:16/9!important}
+.projects .cover-20 .cover-art img{object-position:center;filter:saturate(.65) brightness(.82)}
+.projects .cover-20:after{background:linear-gradient(90deg,rgba(3,18,30,.14) 25%,rgba(3,18,30,.75) 57%,rgba(3,18,30,.95) 100%)}
+.projects .cover-20 .cover-editorial-copy{width:46%;inset:auto 5% 12% auto;text-align:start}
+.projects .cover-20 .cover-editorial-copy h3{font-size:8.2cqw;line-height:.98}
+.fa .projects .cover-20 .cover-editorial-copy h3{font-size:9.5cqw;line-height:1.3}
+.projects .cover-20 .cover-signature{font-size:3.8cqw}
