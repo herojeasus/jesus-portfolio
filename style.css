@@ -573,3 +573,10 @@
 .projects .cover-22 .cover-art img{object-position:center 25%;filter:saturate(.65) brightness(.94)}
 .projects .cover-22 .cover-art:after{content:'';position:absolute;inset:0;background:#164c66;mix-blend-mode:color;pointer-events:none;mask-image:radial-gradient(ellipse 35% 32% at 52% 29%,transparent 40%,#000 90%);-webkit-mask-image:radial-gradient(ellipse 35% 32% at 52% 29%,transparent 40%,#000 90%)}
 .projects .cover-22:after{background:linear-gradient(180deg,transparent 35%,rgba(3,18,30,.35) 60%,rgba(3,18,30,.97) 100%)}
+
+/* Fantasy Acting: original frame with shared midnight cover treatment. */
+.projects.all-projects .cover-23{aspect-ratio:3/4!important}
+.projects .cover-23 .cover-art{isolation:isolate}
+.projects .cover-23 .cover-art img{object-position:center 25%;filter:saturate(.65) brightness(.94)}
+.projects .cover-23 .cover-art:after{content:'';position:absolute;inset:0;background:#164c66;mix-blend-mode:color;pointer-events:none;mask-image:radial-gradient(ellipse 35% 32% at 52% 29%,transparent 40%,#000 90%);-webkit-mask-image:radial-gradient(ellipse 35% 32% at 52% 29%,transparent 40%,#000 90%)}
+.projects .cover-23:after{background:linear-gradient(180deg,transparent 35%,rgba(3,18,30,.35) 60%,rgba(3,18,30,.97) 100%)}
