@@ -590,3 +590,16 @@
 
 .projects.all-projects .cover-25{aspect-ratio:3/4!important}.projects .cover-25 .cover-art img{object-position:center 35%;filter:saturate(.6) brightness(.95)}.projects .cover-25:after{background:linear-gradient(180deg,rgba(3,18,30,.1) 20%,rgba(3,18,30,.35) 55%,rgba(3,18,30,.98) 100%)}
 .projects.all-projects .cover-26{aspect-ratio:3/4!important}.projects .cover-26 .cover-art img{object-position:center 35%;filter:saturate(.7) brightness(.95)}.projects .cover-26:after{background:linear-gradient(180deg,rgba(3,18,30,.1) 20%,rgba(3,18,30,.25) 55%,rgba(3,18,30,.98) 100%)}
+
+/* Shared navigation follows the reading direction on every page. */
+.topbar{direction:ltr}
+.fa .topbar{direction:rtl}
+@media(min-width:1001px){
+ .topbar nav{order:-1}
+ .topbar .brand{margin-inline-start:auto;margin-inline-end:0}
+}
+@media(max-width:1000px){
+ .topbar .header-controls{order:-1;margin-inline-end:auto}
+ .topbar .brand{margin-inline:0}
+ .topbar nav{text-align:start;align-items:flex-start}
+}
