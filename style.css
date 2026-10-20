@@ -587,3 +587,5 @@
 .projects .cover-24 .cover-art img{object-position:center 25%;filter:saturate(.65) brightness(.94)}
 .projects .cover-24 .cover-art:after{content:'';position:absolute;inset:0;background:#164c66;mix-blend-mode:color;pointer-events:none;mask-image:radial-gradient(ellipse 35% 32% at 52% 29%,transparent 40%,#000 90%);-webkit-mask-image:radial-gradient(ellipse 35% 32% at 52% 29%,transparent 40%,#000 90%)}
 .projects .cover-24:after{background:linear-gradient(180deg,transparent 35%,rgba(3,18,30,.35) 60%,rgba(3,18,30,.97) 100%)}
+
+.projects.all-projects .cover-25{aspect-ratio:3/4!important}.projects .cover-25 .cover-art img{object-position:center 35%;filter:saturate(.6) brightness(.95)}.projects .cover-25:after{background:linear-gradient(180deg,rgba(3,18,30,.1) 20%,rgba(3,18,30,.35) 55%,rgba(3,18,30,.98) 100%)}
