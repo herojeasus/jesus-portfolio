@@ -102,6 +102,14 @@
     navigationBusy = false;
   };
 
+  // Home links point at index.html; route them through the wipe on any host path.
+  document.addEventListener('click', e => {
+    const a = e.target instanceof Element ? e.target.closest('a[href="index.html"],a[href="./"]') : null;
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    changePage('home', location.pathname);
+  }, true);
+
   /* ---------- Theme & language: view-transition sweeps ---------- */
   document.addEventListener('click', e => {
     const t = e.target instanceof Element ? e.target : null;
