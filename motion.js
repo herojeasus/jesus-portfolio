@@ -55,14 +55,14 @@ function expandCinema(source) {
     const show=(text)=>{status.textContent=text;status.hidden=false};
     const hide=()=>{status.hidden=true};
     const play=()=>{
-      show(B('Loading film…','در حال آماده‌شدن فیلم…'));
+      show(B('Loading film…','فیلم داره لود می‌شه…'));
       const result=video.play();
       result?.catch(()=>{if(dialog.open&&video.isConnected&&!signal.aborted)show(B('Play film','پخش فیلم'))});
     };
     video.addEventListener('playing',hide,{signal});
     video.addEventListener('loadeddata',hide,{signal});
-    video.addEventListener('waiting',()=>show(B('Loading film…','در حال آماده‌شدن فیلم…')),{signal});
-    video.addEventListener('error',()=>show(B('Couldn’t load the film. Tap to retry.','فیلم بارگذاری نشد؛ برای تلاش دوباره بزن.')),{signal});
+    video.addEventListener('waiting',()=>show(B('Loading film…','فیلم داره لود می‌شه…')),{signal});
+    video.addEventListener('error',()=>show(B('Couldn’t load the film. Tap to retry.','فیلم لود نشد؛ دوباره بزن.')),{signal});
     status.addEventListener('click',()=>{if(video.error)video.load();play()},{signal});
     play();
   }
@@ -138,15 +138,15 @@ function mountMotion() {
       on(a,'click',e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0)return;e.preventDefault();changePage(url.searchParams.get('view')||'home',url.href)});
     }
   });
-  const backstageTitles=[['THE OTHER SIDE','آن سوی دوربین','FRAMES / PEOPLE / STORIES','قاب‌ها / آدم‌ها / روایت‌ها'],['LIVE. ON SET.','ضربِ صحنه','LIGHT / SOUND / ACTION','نور / صدا / حرکت'],['THE CAMERA CREW','گروه دوربین','PEOPLE BEHIND THE FRAME','آدم‌های پشت قاب'],['BUILDING A SCENE','ساختنِ یک صحنه','FROM LIGHT TO FRAME','از نور تا تصویر']];
+  const backstageTitles=[['THE OTHER SIDE','اون طرف دوربین','FRAMES / PEOPLE / STORIES','قاب / آدم / قصه'],['LIVE. ON SET.','سر صحنه، زنده','LIGHT / SOUND / ACTION','نور / صدا / حرکت'],['THE CAMERA CREW','تیم دوربین','PEOPLE BEHIND THE FRAME','بچه‌های پشت دوربین'],['BUILDING A SCENE','چیدن صحنه','FROM LIGHT TO FRAME','از نور تا قاب']];
   document.querySelectorAll('.backstage-frame').forEach((frame,i)=>{
     const video=frame.querySelector('video');
     const src=video.getAttribute('src'),poster=cinemaCoverFrames['bts-'+String(i+1).padStart(2,'0')];
     const words=backstageTitles[i],title=B(words[0],words[1]);
     frame.classList.add('bts-poster','bts-poster-'+(i+1));
     frame.innerHTML=`<div class="bts-photo"><img src="${poster}" alt="${title}" loading="lazy"></div><div class="bts-topline"><span>${B('BEHIND THE SCENES','پشت صحنه')}</span><span class="bts-rec"><i></i> 0${i+1}</span></div><div class="bts-editorial"><span class="bts-subtitle">${B(words[2],words[3])}</span><strong>${title}</strong><span class="bts-number" aria-hidden="true">0${i+1}</span></div><button class="frame-open bts-full-open" aria-label="${B('Watch backstage film: ','دیدن پشت‌صحنه: ')+title}"><span class="bts-play-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m9 5 10 7-10 7Z"/></svg></span></button>`;
-    frame.closest('.backstage-card').querySelector('h2').innerHTML=`<span>${B('ON SET','سر صحنه')} / 0${i+1}</span><span>${B('PLAY FILM ↗','تماشای فیلم ↗')}</span>`;
-    on(frame.querySelector('button'),'click',()=>openCinemaMedia(frame,{src,poster,title,description:B('A few moments from behind the camera.','چند لحظه از اون طرف دوربین.')}));
+    frame.closest('.backstage-card').querySelector('h2').innerHTML=`<span>${B('ON SET','سر صحنه')} / 0${i+1}</span><span>${B('PLAY FILM ↗','پخش فیلم ↗')}</span>`;
+    on(frame.querySelector('button'),'click',()=>openCinemaMedia(frame,{src,poster,title,description:B('A few moments from behind the camera.','چند تا لحظه از سر صحنه؛ همون چیزایی که تو فیلم نهایی دیده نمی‌شن.')}));
   });
   document.querySelectorAll('.personal-cat,.travel-moment').forEach(frame=>{
     const img=frame.querySelector('img');
