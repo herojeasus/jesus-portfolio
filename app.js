@@ -88,7 +88,7 @@ const contentPass={
  5:{en:'60 Seconds to Destruction',fa:'۶۰ ثانیه تا نابودی',lines:[['60 SECONDS','TO DESTRUCTION'],['۶۰ ثانیه','تا نابودی']],label:['Faramouj','فراموج']},
  6:{en:'Game Awards',fa:'گیم اواردز',lines:[['GAME','AWARDS'],['گیم','اواردز']],label:['Zoomg','زومجی']},
  7:{en:'On the Road',fa:'در مسیر',lines:[['ON THE','ROAD'],['در مسیر']],label:['Personal project','پروژه‌ی شخصی']},
- 9:{en:'Enter with Anger',fa:'با خشم وارد شوید',lines:[['ENTER','WITH ANGER'],['با خشم','وارد شوید']],label:['Hootan Shakiba','هوتن شکیبا']},
+ 9:{en:'Enter with Anger',fa:'با خشم وارد شوید',lines:[['ENTER','WITH ANGER'],['با خشم','وارد شوید']],label:['Pouyan Festival','جشنواره‌ی پویان']},
  10:{en:'Website Intro',fa:'معرفی سایت',lines:[['WEBSITE','INTRO'],['معرفی','سایت']],label:['Maziar Faghihi','مازیار فقیهی']},
  11:{en:'Zavie Restaurant',fa:'رستوران زاویه',lines:[['ZAVIE','RESTAURANT'],['رستوران','زاویه']],label:['Faramouj','فراموج']},
  12:{en:'From Idea to Execution',fa:'از ایده تا اجرا',lines:[['FROM IDEA','TO EXECUTION'],['از ایده','تا اجرا']],label:['Maziar Faghihi','مازیار فقیهی']},
@@ -98,14 +98,15 @@ const contentPass={
  19:{en:'One Year in Business',fa:'جشن یک‌سالگی کسب‌وکار',lines:[['ONE YEAR','IN BUSINESS'],['جشن یک‌سالگی','کسب‌وکار']],label:['Faramouj','فراموج']},
  20:{en:'Festival Nominees',fa:'نامزدهای جشنواره',lines:[['FESTIVAL','NOMINEES'],['نامزدهای','جشنواره']],label:['Pouyan Festival','جشنواره‌ی پویان']},
  21:{en:'Travelous',fa:'سفرناک',lines:[['TRAVELOUS'],['سفرناک']],label:['Pouyan Festival','جشنواره‌ی پویان']},
- 22:{en:'Fantasy Acting',fa:'بازیگری فانتزی',lines:[['FANTASY','ACTING'],['بازیگری','فانتزی']],label:['Ali Foroutan','علی فروتن']},
+ 22:{en:'Fantasy Acting',fa:'بازیگری فانتزی',lines:[['FANTASY','ACTING'],['بازیگری','فانتزی']],label:['Pouyan Festival','جشنواره‌ی پویان']},
  23:{en:'A Black & White Story',fa:'یک داستان سیاه و سفید',lines:[['A BLACK &','WHITE STORY'],['یک داستان','سیاه و سفید']],label:['Pouyan Festival','جشنواره‌ی پویان']},
- 24:{en:'Varied Tales',fa:'قصه‌های جورواجور',lines:[['VARIED','TALES'],['قصه‌های','جورواجور']],label:['Farrokh Yekdaneh','فرخ یکدانه']},
+ 24:{en:'Varied Tales',fa:'قصه‌های جورواجور',lines:[['VARIED','TALES'],['قصه‌های','جورواجور']],label:['Pouyan Festival','جشنواره‌ی پویان']},
  25:{en:'Formula 1 Live',fa:'ایونت فرمول یک',lines:[['FORMULA 1','LIVE'],['ایونت','فرمول یک']],label:['7Wears','سون‌ورز']},
  26:{en:'Iran Agrofood',fa:'ایران اگروفود',lines:[['IRAN','AGROFOOD'],['ایران','اگروفود']],label:['Nilito','نیلی‌تو']}
 };
 const pouyan=['Pouyan Animation Festival','جشنواره‌ی انیمیشن پویان'];
 const clientPass={1:['Faramouj','فراموج'],2:['Faramouj','فراموج'],3:['Faramouj','فراموج'],5:['Faramouj','فراموج'],10:['Maziar Faghihi','مازیار فقیهی'],12:['Maziar Faghihi','مازیار فقیهی'],15:['Zoomg','زومجی'],16:['Zoomg','زومجی'],17:['Zoomg','زومجی'],9:pouyan,20:pouyan,21:pouyan,22:pouyan,23:pouyan,24:pouyan};
+const commissionPass={4:['Gorilla Studio','گوریلا استودیو'],11:['Faramouj','فراموج'],19:['Faramouj','فراموج'],9:pouyan,20:pouyan,21:pouyan,22:pouyan,23:pouyan,24:pouyan,6:['Zoomg','زومجی']};
 const textPass={
  1:[null,'یه ریل داستانی برای معرفی آدم‌های فراموج، درباره‌ی تأثیر محیط روی خلاقیت. فیلم‌برداری، نورپردازی، تدوین و اصلاح رنگ با من بود و سناریو رو شقایق زعیم نوشت.'],
  2:[null,'یه ریل برای فراموج درباره‌ی اینکه موقع طراحی سایت چطور انتخاب درستی داشته باشیم. فیلم‌برداری، نورپردازی، تدوین و اصلاح رنگ با من بود و سناریو رو شقایق زعیم نوشت.'],
@@ -134,6 +135,7 @@ projectRecords.forEach(p=>{
  const c=contentPass[p.id];
  if(c){p.title=c.en;p.titleFa=c.fa;coverLines[p.id]=c.lines;coverCopy[p.id]=[c.en,c.fa,c.label[0],c.label[1]]}
  if(clientPass[p.id]){p.client=clientPass[p.id][0];p.clientFa=clientPass[p.id][1]}
+ if(p.id!==7){const by=commissionPass[p.id]||[p.client,p.clientFa||p.client];p.commissionedBy=by[0];p.commissionedByFa=by[1]}
  const t=textPass[p.id];if(t){if(t[0])p.description=t[0];if(t[1])p.descriptionFa=t[1]}
  if([6,15,16,17].includes(p.id)){p.year='December 2025';p.yearFa='دسامبر ۲۰۲۵'}
  if(p.active!==false)p.published=true;

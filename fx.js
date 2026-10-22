@@ -25,14 +25,17 @@
     const label = ring.firstChild;
     document.body.append(ring, dot);
     let x = 0, y = 0, rx = 0, ry = 0, seen = false;
+    const modalOpen = () => document.body.classList.contains('modal-open');
+    new MutationObserver(() => html.classList.toggle('fx-cursor-on', seen && !modalOpen()))
+      .observe(document.body, { attributes: true, attributeFilter: ['class'] });
     addEventListener('pointermove', e => {
       if (e.pointerType !== 'mouse') return;
       x = e.clientX; y = e.clientY;
       dot.style.translate = `${x}px ${y}px`;
-      if (!seen) { seen = true; rx = x; ry = y; html.classList.add('fx-cursor-on'); }
+      if (!seen) { seen = true; rx = x; ry = y; if (!modalOpen()) html.classList.add('fx-cursor-on'); }
     }, { passive: true });
     document.addEventListener('mouseleave', () => html.classList.remove('fx-cursor-on'));
-    document.addEventListener('mouseenter', () => { if (seen) html.classList.add('fx-cursor-on'); });
+    document.addEventListener('mouseenter', () => { if (seen && !modalOpen()) html.classList.add('fx-cursor-on'); });
     (function loop() {
       rx += (x - rx) * 0.2; ry += (y - ry) * 0.2;
       ring.style.translate = `${rx}px ${ry}px`;
@@ -174,12 +177,40 @@
         .finished.then(() => el.classList.remove('fx-stagger')).catch(() => {});
     });
   }
+  const baseMedia = openCinemaMedia;
+  openCinemaMedia = function (source, options) {
+    const from = options?.photo ? source?.querySelector('img') : (source?.querySelector('.bts-photo') || source);
+    stopPreview(source);
+    if (!vtOK() || !from) { baseMedia(source, options); afterOpen(); return; }
+    from.style.viewTransitionName = 'fx-cinema';
+    html.classList.add('fx-vt-cinema');
+    const vt = document.startViewTransition(() => {
+      from.style.viewTransitionName = '';
+      baseMedia(source, options);
+      cinemaAnimation?.cancel();
+      const target = document.querySelector('#project-dialog .cinema-stage, #project-dialog .cinema-photo');
+      if (target) target.style.viewTransitionName = 'fx-cinema';
+      prepareStagger();
+    });
+    vt.finished.finally(() => {
+      const target = document.querySelector('#project-dialog .cinema-stage, #project-dialog .cinema-photo');
+      if (target) target.style.viewTransitionName = '';
+      html.classList.remove('fx-vt-cinema');
+      runStagger();
+    });
+  };
+  const sourceFrame = src => {
+    if (!src) return null;
+    const card = src.closest?.('.project-card');
+    if (card) return card.querySelector('.project-image');
+    if (src.matches?.('.personal-cat,.travel-moment')) return src.querySelector('img');
+    return src.querySelector?.('.bts-photo') || src;
+  };
   const baseClose = closeCinema;
   closeCinema = function (immediate = false) {
     const dialog = document.querySelector('#project-dialog');
-    const stage = dialog?.querySelector('.cinema-stage');
-    const card = cinemaSource?.closest?.('.project-card');
-    const frame = card?.querySelector('.project-image');
+    const stage = dialog?.querySelector('.cinema-stage, .cinema-photo');
+    const frame = sourceFrame(cinemaSource);
     const visible = frame && (() => { const r = frame.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; })();
     if (!dialog?.open || !vtOK() || !stage || !visible) return baseClose(immediate);
     stage.style.viewTransitionName = 'fx-cinema';
@@ -196,13 +227,19 @@
   const previewSrc = id => `previews/p-${pad(id)}.mp4`;
   function ensurePreview(card) {
     if (card._fxVideo) return card._fxVideo;
-    const rec = projectRecords[+card.dataset.project];
-    if (!rec) return null;
+    let src = card._fxSrc, host = card._fxHost;
+    if (!src) {
+      const rec = projectRecords[+card.dataset.project];
+      if (!rec) return null;
+      src = previewSrc(rec.id); host = card.querySelector('.project-image');
+    }
+    if (!host) return null;
     const v = document.createElement('video');
     Object.assign(v, { muted: true, loop: true, playsInline: true, preload: 'auto' });
     v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
-    v.className = 'fx-preview'; v.src = previewSrc(rec.id);
-    card.querySelector('.project-image').prepend(v);
+    v.className = 'fx-preview'; v.src = src;
+    const still = host.querySelector('img');
+    if (still) still.after(v); else host.prepend(v);
     const tc = card.querySelector('.fx-tc'), bar = card.querySelector('.fx-progress');
     v.addEventListener('timeupdate', () => {
       if (tc) tc.textContent = digits(timecode(v.currentTime));
@@ -264,18 +301,98 @@
       }
     });
 
-    // Touch screens: the card most in view plays its footage, one at a time.
-    if (touch.matches && !reduced() && !saveData && cards.length) {
-      const ratios = new Map();
-      let current = null;
-      const io = new IntersectionObserver(entries => {
-        entries.forEach(en => ratios.set(en.target, en.intersectionRatio));
-        let best = null, bestRatio = 0.6;
-        ratios.forEach((ratio, card) => { if (ratio > bestRatio) { best = card; bestRatio = ratio; } });
-        if (best !== current) { stopPreview(current); current = best; if (best) startPreview(best); }
-      }, { threshold: [0, 0.3, 0.6, 0.8, 1] });
-      cards.forEach(c => io.observe(c));
-      cleanup.push(() => { io.disconnect(); stopPreview(current); });
+    autoplayInView(cards, cleanup);
+  }
+
+  // Touch screens: the frame most in view plays its footage, one at a time.
+  function autoplayInView(items, cleanup) {
+    if (!touch.matches || reduced() || saveData || !items.length) return;
+    const ratios = new Map();
+    let current = null;
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => ratios.set(en.target, en.intersectionRatio));
+      let best = null, bestRatio = 0.6;
+      ratios.forEach((ratio, el) => { if (ratio > bestRatio) { best = el; bestRatio = ratio; } });
+      if (best !== current) { stopPreview(current); current = best; if (best) startPreview(best); }
+    }, { threshold: [0, 0.3, 0.6, 0.8, 1] });
+    items.forEach(c => io.observe(c));
+    cleanup.push(() => { io.disconnect(); stopPreview(current); });
+  }
+
+  /* ---------- Backstage films and About photos ---------- */
+  const hud = (readout = true) => `<span class="fx-hud" aria-hidden="true"><i class="fx-corner tl"></i><i class="fx-corner tr"></i><i class="fx-corner bl"></i><i class="fx-corner br"></i>` +
+    (readout ? `<span class="fx-readout"><b></b><span>REC</span><span class="fx-tc">${digits('00:00:00:00')}</span></span><span class="fx-progress"><i></i></span>` : '') + `</span>`;
+  function wipeIn(frame, watch, img, cleanup) {
+    if (reduced()) return;
+    frame.style.setProperty('--fx-r', getComputedStyle(frame).borderTopLeftRadius || '24px');
+    frame.classList.add('fx-wipe');
+    frame.insertAdjacentHTML('beforeend', '<i class="fx-scan" aria-hidden="true"></i>');
+    let seen = false, loaded = !img || img.complete;
+    const show = () => { if (seen && loaded) frame.classList.add('fx-shown'); };
+    if (!loaded) {
+      const done = () => { loaded = true; show(); };
+      img.addEventListener('load', done, { once: true }); img.addEventListener('error', done, { once: true }); setTimeout(done, 1800);
+    }
+    const io = new IntersectionObserver(([en]) => { if (en.isIntersecting) { seen = true; show(); io.disconnect(); } }, { threshold: 0.12 });
+    io.observe(watch);
+    cleanup.push(() => io.disconnect());
+  }
+  function attachTilt(el, cleanup, { strength = 3.5, af = null } = {}) {
+    if (!fine.matches || reduced()) return;
+    let lock = 0;
+    const move = e => {
+      const r = el.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      const dx = (px - 0.5) * 2, dy = (py - 0.5) * 2, mag = Math.min(1, Math.hypot(dx, dy));
+      el.style.rotate = mag < 0.02 ? '0 1 0 0deg' : `${-dy} ${dx} 0 ${(mag * strength).toFixed(2)}deg`;
+      el.style.setProperty('--shine-x', `${(px * 100).toFixed(1)}%`);
+      el.style.setProperty('--shine-y', `${(py * 100).toFixed(1)}%`);
+      if (af) {
+        af.style.translate = `${(e.clientX - r.left).toFixed(0)}px ${(e.clientY - r.top).toFixed(0)}px`;
+        af.classList.remove('is-locked'); clearTimeout(lock);
+        lock = setTimeout(() => af.classList.add('is-locked'), 380);
+      }
+    };
+    const leave = () => { el.style.rotate = '0 1 0 0deg'; if (af) { clearTimeout(lock); af.classList.remove('is-locked'); } };
+    el.addEventListener('pointermove', move, { passive: true });
+    el.addEventListener('pointerleave', leave);
+    cleanup.push(() => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerleave', leave); clearTimeout(lock); });
+  }
+  function mountFrames(cleanup) {
+    const films = [...document.querySelectorAll('.backstage-frame.bts-poster')];
+    films.forEach((frame, i) => {
+      if (frame.classList.contains('fx-frame')) return;
+      frame.classList.add('fx-frame');
+      const photo = frame.querySelector('.bts-photo');
+      photo?.insertAdjacentHTML('beforeend', hud());
+      frame.insertAdjacentHTML('beforeend', '<span class="fx-glare" aria-hidden="true"></span>');
+      frame._fxSrc = `previews/bts-${pad(i + 1)}.mp4`;
+      frame._fxHost = photo;
+      wipeIn(frame, frame.closest('.backstage-card') || frame, photo?.querySelector('img'), cleanup);
+      attachTilt(frame, cleanup, { strength: 4 });
+      if (fine.matches && !reduced()) {
+        const enter = () => startPreview(frame), leave = () => stopPreview(frame);
+        frame.addEventListener('pointerenter', enter);
+        frame.addEventListener('pointerleave', leave);
+        cleanup.push(() => { frame.removeEventListener('pointerenter', enter); frame.removeEventListener('pointerleave', leave); });
+      }
+    });
+    autoplayInView(films, cleanup);
+
+    document.querySelectorAll('.personal-cat,.travel-moment,.about-portrait').forEach(fig => {
+      if (fig.classList.contains('fx-frame')) return;
+      fig.classList.add('fx-frame');
+      if (getComputedStyle(fig).position === 'static') fig.style.position = 'relative';
+      fig.insertAdjacentHTML('beforeend', hud(false) + '<span class="fx-glare" aria-hidden="true"></span><span class="fx-af" aria-hidden="true"><span class="fx-af-label">AF · LOCK</span></span>');
+      wipeIn(fig, fig.parentElement || fig, fig.querySelector('img'), cleanup);
+      attachTilt(fig, cleanup, { strength: 3, af: fig.querySelector('.fx-af') });
+    });
+
+    const music = document.querySelector('.music-moment');
+    if (music && !music.querySelector('.fx-eq')) {
+      music.classList.add('fx-frame');
+      music.insertAdjacentHTML('beforeend', '<span class="fx-eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="fx-glare" aria-hidden="true"></span>');
+      attachTilt(music, cleanup, { strength: 2.5 });
     }
   }
 
@@ -348,7 +465,7 @@
   }
   function mountLabels(cleanup) {
     if (reduced()) return;
-    const targets = document.querySelectorAll('.section-kicker,.slot-label,.footer-note>small,.contact-card small,.connect-block>small,.skill-number,.job>small');
+    const targets = document.querySelectorAll('.section-kicker,.slot-label,.footer-note>small,.contact-card small,.connect-block>small,.skill-number,.job>small,.bts-subtitle,.bts-topline>span:first-child,.personal-cat figcaption small');
     const counters = document.querySelectorAll('.fx-count[data-count]');
     const io = new IntersectionObserver(entries => entries.forEach(en => {
       if (!en.isIntersecting) return;
@@ -390,6 +507,7 @@
     unmount = [];
     mountHero(unmount);
     mountCards(unmount);
+    mountFrames(unmount);
     mountLabels(unmount);
     mountMarquee(unmount);
   }

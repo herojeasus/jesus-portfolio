@@ -19,6 +19,9 @@
   .home-projects .project-grid .cover-play { width:34px; height:34px; border-radius:11px; }
 }
 
+/* Percentage row gaps resolve against the finished height and overflow on one-column layouts (cropped the last skill card on phones). */
+.skills-layout,.about-layout,.personal-intro,.service { row-gap:clamp(40px,7vw,72px); }
+
 /* ---------- Film grain ---------- */
 body::after {
   content:''; position:fixed; inset:-50%; z-index:9990; pointer-events:none; opacity:.045;
@@ -42,7 +45,6 @@ html.fx-cursor-on .fx-cursor,html.fx-cursor-on .fx-cursor-dot { opacity:1; }
 .fx-cursor.is-play .fx-cursor-label { opacity:1; transform:none; }
 .fx-cursor.is-play ~ .fx-cursor-dot { opacity:0!important; }
 html.fx-cursor-on,html.fx-cursor-on * { cursor:none!important; }
-html.fx-cursor-on body.modal-open,html.fx-cursor-on body.modal-open * { cursor:revert!important; }
 body.modal-open .fx-cursor,body.modal-open .fx-cursor-dot { opacity:0!important; }
 html.fx-cursor-on .project-card .hover-disc { display:none; }
 
@@ -133,10 +135,51 @@ html.fx-vt-plain::view-transition-old(root) { z-index:1; }
 html.fx-vt-plain::view-transition-new(root) { z-index:2; }
 #project-dialog .fx-stagger { opacity:0; }
 
+/* ---------- Backstage + About frames ---------- */
+.backstage-card,.personal-intro,.personal-moments,.about-layout { perspective:1600px; }
+.fx-frame { transition:rotate .6s var(--fx-ease),clip-path 1.15s var(--fx-ease-io); will-change:rotate; }
+html.fx-on .fx-frame.fx-wipe { clip-path:inset(100% 0 0 0 round var(--fx-r,24px))!important; }
+html.fx-on .fx-frame.fx-wipe.fx-shown { clip-path:inset(0 0 0 0 round var(--fx-r,24px))!important; }
+.fx-frame.fx-shown > .fx-scan { animation:fx-scan 1.15s var(--fx-ease-io) both; }
+.fx-frame:hover .fx-hud,.fx-frame.fx-live .fx-hud { opacity:1; }
+.fx-frame:hover .fx-corner,.fx-frame.fx-live .fx-corner { translate:0 0; }
+.fx-frame:hover .fx-glare { opacity:1; }
+.bts-photo .fx-preview { z-index:auto; object-fit:cover; }
+.bts-photo .fx-hud { inset:12px; }
+.bts-photo .fx-readout { top:auto; bottom:4px; right:26px; left:auto; }
+.bts-photo .fx-progress { display:none; }
+.fx-live .bts-play-circle { opacity:0; transition:opacity .3s; }
+/* Autofocus point that follows the pointer and locks when it rests */
+.fx-af { position:absolute; z-index:6; top:0; left:0; width:54px; height:54px; margin:-27px 0 0 -27px; pointer-events:none; opacity:0; transition:opacity .25s,scale .35s var(--fx-ease); }
+.fx-af { color:#ffffffe0; }
+.fx-af::before { content:''; position:absolute; inset:0; background:
+  linear-gradient(currentColor,currentColor) top left/14px 1.5px, linear-gradient(currentColor,currentColor) top left/1.5px 14px,
+  linear-gradient(currentColor,currentColor) top right/14px 1.5px, linear-gradient(currentColor,currentColor) top right/1.5px 14px,
+  linear-gradient(currentColor,currentColor) bottom left/14px 1.5px, linear-gradient(currentColor,currentColor) bottom left/1.5px 14px,
+  linear-gradient(currentColor,currentColor) bottom right/14px 1.5px, linear-gradient(currentColor,currentColor) bottom right/1.5px 14px;
+  background-repeat:no-repeat; filter:drop-shadow(0 0 4px #0008); transition:color .2s; }
+.fx-af::after { content:''; position:absolute; left:50%; top:50%; width:3px; height:3px; margin:-1.5px; border-radius:50%; background:currentColor; }
+.fx-frame:hover .fx-af { opacity:1; }
+.fx-af.is-locked { scale:.82; color:#8fe388; }
+.fx-af-label { position:absolute; top:calc(100% + 6px); left:50%; translate:-50% 0; color:#fff; font:500 9px/1 var(--fx-mono); letter-spacing:.16em; white-space:nowrap; opacity:0; transition:opacity .2s; direction:ltr; text-shadow:0 1px 6px #000a; }
+.fx-af.is-locked .fx-af-label { opacity:1; }
+/* Spotify card: live level meter */
+.fx-eq { position:absolute; top:50px; inset-inline-end:50px; display:flex; align-items:flex-end; gap:4px; height:28px; z-index:1; }
+.fx-eq i { width:4px; height:100%; border-radius:2px; background:#1ed760; transform-origin:bottom; animation:fx-eq 1s var(--fx-ease) infinite alternate; }
+.fx-eq i:nth-child(2) { animation-duration:.7s; animation-delay:-.2s; }
+.fx-eq i:nth-child(3) { animation-duration:1.25s; animation-delay:-.5s; }
+.fx-eq i:nth-child(4) { animation-duration:.85s; animation-delay:-.35s; }
+.fx-eq i:nth-child(5) { animation-duration:1.1s; animation-delay:-.65s; }
+.music-moment:hover .fx-eq i { animation-duration:.38s; }
+@keyframes fx-eq { from { transform:scaleY(.18); } to { transform:scaleY(1); } }
+@media (max-width:700px) { .fx-eq { top:34px; inset-inline-end:30px; } }
+
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion:reduce) {
   body::after { animation:none; }
-  .fx-cursor,.fx-cursor-dot,.fx-hud,.fx-scan,.fx-glare,.fx-preview,.fx-shutter { display:none!important; }
+  .fx-cursor,.fx-cursor-dot,.fx-hud,.fx-scan,.fx-glare,.fx-preview,.fx-shutter,.fx-af { display:none!important; }
+  html.fx-on .fx-frame.fx-wipe { clip-path:none!important; }
+  .fx-eq i { animation:none; transform:scaleY(.6); }
   html.fx-on .projects .project-card .project-image { clip-path:none!important; }
   .fx-letter { animation:none; }
   .hero .hero-image { translate:none; }
