@@ -93,8 +93,9 @@ html.fx-on .all-projects .project-card.in.fx-ready .project-image { clip-path:in
 .fx-letter { display:inline-block; animation:fx-letter 1.15s var(--fx-ease) both; animation-delay:calc(var(--i) * 42ms + 120ms); }
 .last-name .fx-letter { animation-delay:calc(var(--i) * 42ms + 380ms); }
 @keyframes fx-letter { from { opacity:0; transform:translateY(70%) rotate(7deg); filter:blur(10px); } to { opacity:1; transform:none; filter:none; } }
-.fx-word-in { animation:fx-word-in 1.2s var(--fx-ease-io) both!important; }
-@keyframes fx-word-in { from { clip-path:inset(0 0 0 100%); opacity:.2; } to { clip-path:inset(0 0 0 0); opacity:1; } }
+/* Negative vertical insets so tall Persian strokes (گ) are never clipped; no fill, so the clip is gone after the reveal. */
+.fx-word-in { animation:fx-word-in 1.2s var(--fx-ease-io) backwards!important; }
+@keyframes fx-word-in { from { clip-path:inset(-40% -10% -40% 100%); opacity:.2; } to { clip-path:inset(-40% -10% -40% -10%); opacity:1; } }
 .hero .hero-image { translate:var(--fx-hx,0px) var(--fx-hy,0px); scale:1.04; transition:opacity 1.4s ease,transform 7s linear,translate 1.2s var(--fx-ease); }
 .fx-hero-hud { position:absolute; z-index:3; top:96px; right:var(--gutter,32px); display:flex; align-items:center; gap:10px; color:#fff; font:500 11px/1 var(--fx-mono); letter-spacing:.14em; opacity:0; animation:fx-fade .8s 1.1s both; direction:ltr; text-shadow:0 1px 10px #0009; }
 .fx-hero-hud b { width:8px; height:8px; border-radius:50%; background:#ff453a; box-shadow:0 0 12px #ff453a; animation:fx-blink 1s steps(2,start) infinite; }
@@ -173,6 +174,12 @@ html.fx-on .fx-frame.fx-wipe.fx-shown { clip-path:inset(0 0 0 0 round var(--fx-r
 .music-moment:hover .fx-eq i { animation-duration:.38s; }
 @keyframes fx-eq { from { transform:scaleY(.18); } to { transform:scaleY(1); } }
 @media (max-width:700px) { .fx-eq { top:34px; inset-inline-end:30px; } }
+
+.footer-personal { padding-top:60px; }
+/* Persian caption starts on the right, so the expand button moves left */
+.fa .travel-moment .photo-open { right:auto; left:22px; }
+.back-to-top svg { transition:translate .45s var(--fx-ease); }
+.back-to-top:hover svg { translate:0 -3px; }
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion:reduce) {

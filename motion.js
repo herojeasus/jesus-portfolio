@@ -138,7 +138,7 @@ function mountMotion() {
       on(a,'click',e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0)return;e.preventDefault();changePage(url.searchParams.get('view')||'home',url.href)});
     }
   });
-  const backstageTitles=[['THE OTHER SIDE','اون طرف دوربین','FRAMES / PEOPLE / STORIES','قاب / آدم / قصه'],['LIVE. ON SET.','سر صحنه، زنده','LIGHT / SOUND / ACTION','نور / صدا / حرکت'],['THE CAMERA CREW','تیم دوربین','PEOPLE BEHIND THE FRAME','بچه‌های پشت دوربین'],['BUILDING A SCENE','چیدن صحنه','FROM LIGHT TO FRAME','از نور تا قاب']];
+  const backstageTitles=[['ONE FRAME FROM EACH SET','از هر ست، یه قاب','KITCHEN / STUDIO / BEAUTY','آشپزخونه / استودیو / بیوتی'],['BEHIND THE DRUMS','پشت درام','DRUMS / LIGHT / MONITOR','درام / نور / مانیتور'],['FIRST HALF OF 2025','نیمه‌ی اول ۲۰۲۵','EVENTS / SETS / PEOPLE','ایونت / ست / آدم‌ها'],['ON A BEAUTY SET','پشت یه ست بیوتی','SOFT LIGHT / TABLE / TALENT','نور نرم / میز / مدل']];
   document.querySelectorAll('.backstage-frame').forEach((frame,i)=>{
     const video=frame.querySelector('video');
     const src=video.getAttribute('src'),poster=cinemaCoverFrames['bts-'+String(i+1).padStart(2,'0')];

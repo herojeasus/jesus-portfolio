@@ -113,6 +113,33 @@
     changePage('home', location.pathname);
   }, true);
 
+  /* ---------- Back to top: a slow eased glide instead of the native jump ---------- */
+  let glide = 0;
+  function glideTo(target) {
+    cancelAnimationFrame(glide);
+    if (reduced()) { window.scrollTo({ top: target, behavior: 'instant' }); return; }
+    const from = scrollY, dist = target - from;
+    const dur = Math.min(2200, Math.max(950, Math.abs(dist) * 0.32));
+    const t0 = performance.now();
+    const curve = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const stop = () => { cancelAnimationFrame(glide); removeEventListener('wheel', stop); removeEventListener('touchstart', stop); removeEventListener('keydown', stop); };
+    addEventListener('wheel', stop, { passive: true });
+    addEventListener('touchstart', stop, { passive: true });
+    addEventListener('keydown', stop);
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur);
+      window.scrollTo({ top: from + dist * curve(p), behavior: 'instant' });
+      if (p < 1) glide = requestAnimationFrame(step); else stop();
+    };
+    glide = requestAnimationFrame(step);
+  }
+  document.addEventListener('click', e => {
+    const t = e.target instanceof Element ? e.target.closest('.back-to-top,a[href="#top"]') : null;
+    if (!t) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    glideTo(0);
+  }, true);
+
   /* ---------- Theme & language: view-transition sweeps ---------- */
   document.addEventListener('click', e => {
     const t = e.target instanceof Element ? e.target : null;
